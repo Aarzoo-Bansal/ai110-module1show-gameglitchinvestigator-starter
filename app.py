@@ -104,6 +104,9 @@ if "status" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if "game_count" not in st.session_state:
+    st.session_state.game_count = 0
+
 st.subheader("Make a guess")
 
 st.info(
@@ -120,7 +123,7 @@ with st.expander("Developer Debug Info"):
 
 raw_guess = st.text_input(
     "Enter your guess:",
-    key=f"guess_input_{difficulty}"
+    key=f"guess_input_{difficulty}_{st.session_state.game_count}"
 )
 
 col1, col2, col3 = st.columns(3)
@@ -131,10 +134,14 @@ with col2:
 with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
+#FIXME: New Game logic breaks here. Fixed using Claude inbuilt chat. Ask them to check why new game logic is not working
 if new_game:
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(1, 100)
-    st.success("New game started.")
+    st.session_state.status = "playing"
+    st.session_state.history = []
+    # FIXME: we should also empty the raw_guess field. Ask claude what would be the best way to resolve the issue
+    st.session_state.game_count += 1
     st.rerun()
 
 if st.session_state.status != "playing":
