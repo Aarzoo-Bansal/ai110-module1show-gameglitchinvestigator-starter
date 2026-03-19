@@ -3,8 +3,6 @@ import streamlit as st
 from logic_utils import get_range_for_difficulty, parse_guess, check_guess, update_score
 
 
-
-
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
 
 st.title("🎮 Game Glitch Investigator")
@@ -52,7 +50,7 @@ if "game_count" not in st.session_state:
 st.subheader("Make a guess")
 
 st.info(
-    f"Guess a number between 1 and 100. "
+    f"Guess a number between {low} and {high}. "
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
 
@@ -74,7 +72,8 @@ with st.form("guess_form"):
 #FIXME: New Game logic breaks here. Fixed using Claude inbuilt chat. Ask them to check why new game logic is not working
 if new_game:
     st.session_state.attempts = 0
-    st.session_state.secret = random.randint(1, 100)
+    low, high = get_range_for_difficulty(difficulty)
+    st.session_state.secret = random.randint(low, high)
     st.session_state.status = "playing"
     st.session_state.history = []
     # FIXME: we should also empty the raw_guess field. Ask claude what would be the best way to resolve the issue
