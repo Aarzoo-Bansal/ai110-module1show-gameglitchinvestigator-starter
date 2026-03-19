@@ -25,13 +25,22 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+- [X] Describe the game's purpose.
+   - Its a game where the user needs to guess a number between different ranges depending on the difficulty level.
+- [X] Detail which bugs you found.
+   - The hints are not right. They are showing arbitary.
+    - The attempt left on the top did not match the actual attempts left.
+    - When the hints are shown, adding a new number and clicking on submit, first cleared the hint and then I had to click on submit again to the value to be considered as my new answer.
+    - Clicking on new game did not clear the previous outputs and state. Due to this even when I clicked on New Game, I was unable to actually play.
+    - In the input box, it says 'Enter to apply', but the enter button doesn't work.
+- [X] Explain what fixes you applied.
+    - Submit works as expected
+    - Stable secret number
+    - New game resets all the states
+
 
 ## 📸 Demo
-
-- [ ] [Insert a screenshot of your fixed, winning game here]
+![alt text](image-1.png)
 
 ## 🚀 Stretch Features
 
