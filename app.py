@@ -32,19 +32,12 @@ def parse_guess(raw: str):
 def check_guess(guess, secret):
     if guess == secret:
         return "Win", "🎉 Correct!"
-
-    try:
-        if guess > secret:
-            return "Too High", "📈 Go HIGHER!"
-        else:
-            return "Too Low", "📉 Go LOWER!"
-    except TypeError:
-        g = str(guess)
-        if g == secret:
-            return "Win", "🎉 Correct!"
-        if g > secret:
-            return "Too High", "📈 Go HIGHER!"
-        return "Too Low", "📉 Go LOWER!"
+    # FIXME: since now we are only using int, no need from try-catch
+    if guess > secret:
+        #FIXME: fixed messages. Did this myself
+        return "Too High", "📈 Go LOWER!"
+    #FIXME: fixed messages.
+    return "Too Low", "📉 Go HIGHER!"
 
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
@@ -93,7 +86,8 @@ if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 1
+    # FIXME: the attempt should be 0, as initally user has no attemps
+    st.session_state.attempts = 0
 
 if "score" not in st.session_state:
     st.session_state.score = 0
@@ -114,25 +108,20 @@ st.info(
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
 
-with st.expander("Developer Debug Info"):
-    st.write("Secret:", st.session_state.secret)
-    st.write("Attempts:", st.session_state.attempts)
-    st.write("Score:", st.session_state.score)
-    st.write("Difficulty:", difficulty)
-    st.write("History:", st.session_state.history)
+debug_placeholder = st.empty()
 
-raw_guess = st.text_input(
-    "Enter your guess:",
-    key=f"guess_input_{difficulty}_{st.session_state.game_count}"
-)
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    submit = st.button("Submit Guess 🚀")
-with col2:
-    new_game = st.button("New Game 🔁")
-with col3:
-    show_hint = st.checkbox("Show hint", value=True)
+with st.form("guess_form"):
+    raw_guess = st.text_input(
+        "Enter your guess:",
+        key=f"guess_input_{difficulty}_{st.session_state.game_count}"
+    )
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        submit = st.form_submit_button("Submit Guess 🚀")
+    with col2:
+        new_game = st.form_submit_button("New Game 🔁")
+    with col3:
+        show_hint = st.checkbox("Show hint", value=True)
 
 #FIXME: New Game logic breaks here. Fixed using Claude inbuilt chat. Ask them to check why new game logic is not working
 if new_game:
@@ -145,10 +134,16 @@ if new_game:
     st.rerun()
 
 if st.session_state.status != "playing":
+    with debug_placeholder.expander("Developer Debug Info"):
+        st.write("Secret:", st.session_state.secret)
+        st.write("Attempts:", st.session_state.attempts)
+        st.write("Score:", st.session_state.score)
+        st.write("Difficulty:", difficulty)
+        st.write("History:", st.session_state.history)
     if st.session_state.status == "won":
         st.success("You already won. Start a new game to play again.")
     else:
-        st.error("Game over. Start a new game to try again.")
+        st.error("Game already over. Start a new game to try again.")
     st.stop()
 
 if submit:
@@ -162,10 +157,8 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        if st.session_state.attempts % 2 == 0:
-            secret = str(st.session_state.secret)
-        else:
-            secret = st.session_state.secret
+        # FIXME: this seems a litte of. Why we convert to string when attempts are even. Need to make it number only
+        secret = st.session_state.secret
 
         outcome, message = check_guess(guess_int, secret)
 
@@ -193,6 +186,13 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+
+with debug_placeholder.expander("Developer Debug Info"):
+    st.write("Secret:", st.session_state.secret)
+    st.write("Attempts:", st.session_state.attempts)
+    st.write("Score:", st.session_state.score)
+    st.write("Difficulty:", difficulty)
+    st.write("History:", st.session_state.history)
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")
